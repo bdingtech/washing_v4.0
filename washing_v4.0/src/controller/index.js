@@ -38,17 +38,32 @@ async function getDealUrl(type){
  * @description 获取洗衣机状态
  */
 async function getStatus(){
-    let status = await axios.get('http://view.8848y.com/ajax/GetDeviceStatus.ashx?deviceID=60c59d2a-0edc-4e34-b92a-e6f0c4e04f6e&packageID=bed8dd61-8e84-4d4a-a0f9-b755f90bc9b2&AffiliateID=ad5f937e-1bd8-4e6f-b14e-53dce19d1c99')
-    console.log(status.data[0].Key)
-    if(status.data[0].Key == 'online'){
-        return {
-            "stat":"online",
-            "code":200
+    let result = await axios.get('http://view.8848y.com/ajax/GetDeviceStatus.ashx?deviceID=60c59d2a-0edc-4e34-b92a-e6f0c4e04f6e&packageID=bed8dd61-8e84-4d4a-a0f9-b755f90bc9b2&AffiliateID=ad5f937e-1bd8-4e6f-b14e-53dce19d1c99')
+    let status = result.data[0]
+    console.log(status)
+    if(status.Key == 'online'){
+        if(status.Value == '1'){
+            return {
+                "stat": "设备正常",
+                "code": 200
+            }
+        }
+        if(status.Value == '100'){
+            return {
+                "stat": '设备正在运行，请稍后重试！',
+                "code": 300
+            }
+        }
+        if(status.Value == '99'){
+            return {
+                "stat": "设备尚未准备就绪，请稍后重试",
+                "code": 400
+            }
         }
     }else{
         return {
-            "stat":'offline',
-            "code":200
+            "stat":'设备离线,请稍后重试！',
+            "code": 500
         }
     }
 }
